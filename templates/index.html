@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Predictor - Get Your Car's Worth</title>
+
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="car-float">🚗</div>
+        <div class="car-float">🚙</div>
+        <div class="car-float">🚕</div>
+        <div class="car-float">🚐</div>
+        <div class="car-float">🏎️</div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="content-container">
+            <!-- Header Section -->
+            <div class="header-section">
+                <div class="logo">🚗</div>
+                <h1>Car Price Predictor</h1>
+                <p>Discover your car's true market value instantly with our AI-powered prediction technology</p>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <div class="feature-box">
+                    <div class="feature-icon-circle">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Instant Results</h3>
+                    <p>Get predictions in seconds</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon-circle">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI Powered</h3>
+                    <p>Advanced ML algorithms</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon-circle">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Real-Time Data</h3>
+                    <p>Current market trends</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon-circle">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>100% Secure</h3>
+                    <p>Safe and reliable</p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Left Content -->
+                <div class="left-content">
+                    <div class="info-card">
+                        <h3><i class="fas fa-check-circle"></i> How It Works</h3>
+                        <p>Simply enter your car's details including company, model, year of purchase, fuel type, and kilometers driven. Our advanced AI algorithm will analyze thousands of data points to provide you with an accurate market valuation.</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-star"></i> Why Choose Us</h3>
+                        <p>Our machine learning model is trained on extensive real-world car sales data, ensuring you get the most accurate and up-to-date price predictions. We consider all major factors that affect car valuation.</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> About Predictions</h3>
+                        <p>The predicted price is an estimate based on current market conditions. Actual prices may vary based on car condition, location, and individual seller preferences.</p>
+                    </div>
+
+                    <div class="car-illustration-large">🚙</div>
+                </div>
+
+                <!-- Right Content - Form -->
+                <div class="right-content">
+                    <div class="form-container">
+                        <h2 class="form-title">Get Your Car's Value</h2>
+                        <p class="form-subtitle">Fill in the details below to get started</p>
+
+                        <form name="Modelform" onsubmit="return false;">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-building"></i>
+                                    Car Company
+                                </label>
+                                <select class="form-control" id="company" name="company" required
+                                        onchange="load_car_models(this.id,'car_models')">
+                                    {% for company in companies %}
+                                    <option value="{{ company }}">{{ company }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-car"></i>
+                                    Car Model
+                                </label>
+                                <select class="form-control" id="car_models" name="car_models" required>
+                                    <option value="">Select Model</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-calendar"></i>
+                                    Year of Purchase
+                                </label>
+                                <select class="form-control" id="year" name="year" required>
+                                    {% for year in years %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-gas-pump"></i>
+                                    Fuel Type
+                                </label>
+                                <select class="form-control" id="fuel_type" name="fuel_type" required>
+                                    {% for fuel in fuel_types %}
+                                    <option value="{{ fuel }}">{{ fuel }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-road"></i>
+                                    Kilometres Driven
+                                </label>
+                                <input type="text" class="form-control" id="kilo_driven" name="kilo_driven"
+                                       placeholder="e.g., 50000">
+                            </div>
+
+                            <button type="button" class="btn-predict" onclick="send_data()">
+                                <i class="fas fa-calculator"></i> Calculate Price Now
+                            </button>
+                        </form>
+
+                        <!-- Result Container -->
+                        <div class="result-container" id="result-container">
+                            <div class="success-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3>Your Car's Estimated Value</h3>
+                            <div class="price-box">
+                                <div class="price-label">Predicted Price</div>
+                                <div class="price-amount" id="prediction">₹0</div>
+                                <div class="price-label">💡 Based on current market trends</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-section">
+                <p>© 2024 Car Price Predictor. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script id="model-map-data" type="application/json">
+        {{ model_map_json }}
+    </script>
+
+    <script>
+        var model_map = JSON.parse(document.getElementById('model-map-data').textContent);
+
+        function load_car_models(company_id, car_model_id) {
+            var company = document.getElementById(company_id);
+            var car_model = document.getElementById(car_model_id);
+            
+            car_model.value = "";
+            car_model.innerHTML = "";
+            
+            var defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.innerHTML = "Select Model";
+            car_model.add(defaultOption);
+            
+            if (company.value === "Select Company" || !company.value) {
+                return;
+            }
+            
+            if (model_map && company.value in model_map) {
+                model_map[company.value].forEach(function(model) {
+                    var newOption = document.createElement("option");
+                    newOption.value = model;
+                    newOption.innerHTML = model;
+                    car_model.add(newOption);
+                });
+            }
+        }
+
+        function send_data() {
+            var company = document.getElementById('company').value;
+            var car_model = document.getElementById('car_models').value;
+            var year = document.getElementById('year').value;
+            var fuel_type = document.getElementById('fuel_type').value;
+            var kilo_driven = document.getElementById('kilo_driven').value;
+            
+            if (!car_model || car_model === "" || company === "Select Company") {
+                alert("Please select a company and model!");
+                return;
+            }
+            
+            if (!kilo_driven || kilo_driven === "") {
+                alert("Please enter kilometres driven!");
+                return;
+            }
+            
+            var fd = new FormData(document.querySelector('form'));
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', '/predict', true);
+            
+            var resultContainer = document.getElementById('result-container');
+            var predictionElement = document.getElementById('prediction');
+            resultContainer.classList.add('show');
+            predictionElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        var price = parseFloat(xhr.responseText);
+                        var formattedPrice = price.toLocaleString('en-IN', {
+                            maximumFractionDigits: 0
+                        });
+                        predictionElement.innerHTML = "₹" + formattedPrice;
+                    } else {
+                        predictionElement.innerHTML = "Error";
+                        alert("Unable to predict. Please try again.");
+                    }
+                }
+            };
+
+            xhr.send(fd);
+        }
+    </script>
+</body>
+</html>
